@@ -19,6 +19,18 @@ Misuse of this module may be highly insecure and destructive. Please use a
 measure of caution who can connect to your daemon and what necessary access to
 remote systems your daemon may expose when you enable insecure settings.
 
+# Why Do This
+
+Besides potentially offering a small-footprint solution for remote execution
+which might be extended to orchestrate node drain replacement activities, I am
+brand new to Go and there will be a lot of opportunity to exercise many useful
+features of Go -- for example maybe channels to notify on received message, and
+non-trivial parallel execution tasks to transmit commands to multiple agents
+and then to coalesce output for presentation.
+
+I want to learn how to write good Go.
+
+
 # What is Involved
 
 Execute remote agent (after possible replication). Remote agent subscribes to
@@ -66,32 +78,32 @@ shared accounts, whether to require user identify herself upon console startup.
 
 # Concepts
 
-  agent
-  agent/handler
-  handler
-  handler/agent
-  process
-  config
-  state
-  queue
-  daemon
-  console
+- agent
+- agent/handler
+- handler
+- handler/agent
+- process
+- config
+- state
+- queue
+- daemon
+- console
 
 # Use Cases
 
-  console interacts with user
-  console attempts message to daemon
-  console creates daemon process
-  console sends and receives messages to daemon
-  daemon attempts message to agent
-  daemon replicates to remote machine
-  daemon creates agent process
-  daemon sends and receives messages to agent
-  daemon logs consoles, commands, and responses
-  agent replies to ping
-  agent replies to info
-  agent reads or writes a file
-  agent runs a command, captures and transmits output
-  queue notifies listeners of availabilty of incoming message
-  queue allows atomic, thread-safe pop() for multiple threads
+- console interacts with user
+- console attempts message to daemon
+- console creates daemon process
+- console sends and receives messages to daemon
+- daemon attempts message to agent
+- daemon replicates to remote machine
+- daemon creates agent process
+- daemon sends and receives messages to agent
+- daemon logs consoles, commands, and responses
+- agent replies to ping
+- agent replies to info
+- agent reads or writes a file
+- agent runs a command, captures and transmits output
+- queue notifies listeners of availabilty of incoming message
+- queue allows atomic, thread-safe pop() for multiple threads
 
