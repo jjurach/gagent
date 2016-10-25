@@ -2,8 +2,6 @@
 Gagent is a self-replicating, messaging network of remote agents capable of running commands visualizing or processing the output.
 
 [![Build Status](https://travis-ci.org/jjurach/gagent.svg "Travis CI status")](https://travis-ci.org/jjurach/gagent)
-[![CircleCI status](https://circleci.com/gh/jjurach/gagent.png?circle-token=:circle-token "CircleCI status")](https://circleci.com/gh/jjurach/gagent)
-[![GoDoc](https://godoc.org/github.com/jjurach/gagent?status.svg)](https://godoc.org/github.com/jjurach/gagent) 
 
 # Overview
 
