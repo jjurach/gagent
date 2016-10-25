@@ -47,8 +47,6 @@ func ListenAndHandle(addr string, certFile string, keyFile string) error {
 		}
 		go handleConnection(conn)
 	}
-
-	return nil
 }
 
 func handleConnection(conn net.Conn) {
