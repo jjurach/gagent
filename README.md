@@ -1,12 +1,16 @@
 
+Gagent is a self-replicating, messaging network of remote agents capable of running commands visualizing or processing the output.
+
+[![Build Status](https://travis-ci.org/jjurach/gagent.svg "Travis CI status")](https://travis-ci.org/jjurach/gagent)
+[![CircleCI status](https://circleci.com/gh/jjurach/gagent.png?circle-token=:circle-token "CircleCI status")](https://circleci.com/gh/jjurach/gagent)
+[![GoDoc](https://godoc.org/github.com/jjurach/gagent?status.svg)](https://godoc.org/github.com/jjurach/gagent) 
+
 # Overview
 
 Start an interactive command from a UNIX shell which allows you to target (a
 potentially large set of) machines by sending commands and responding to
 output. For example, run the "date" command on all machines of a cluster to
 eyeball whether NTP is likely running.
-
-# vs. Competitors
 
 Chef and Ansible are heavyweight with bulky syntax ruby and python footprints.
 They solve higher level problems.
@@ -28,8 +32,7 @@ features of Go -- for example maybe channels to notify on received message, and
 non-trivial parallel execution tasks to transmit commands to multiple agents
 and then to coalesce output for presentation.
 
-I want to learn how to write good Go.
-
+This is an exercise to learn how to write good Go.
 
 # What is Involved
 
@@ -107,3 +110,51 @@ shared accounts, whether to require user identify herself upon console startup.
 - queue notifies listeners of availabilty of incoming message
 - queue allows atomic, thread-safe pop() for multiple threads
 
+# Keys
+
+```bash
+
+wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+chmod +x cfssl_linux-amd64
+sudo mv cfssl_linux-amd64 /usr/local/bin/cfssl
+
+wget https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+chmod +x cfssljson_linux-amd64
+sudo mv cfssljson_linux-amd64 /usr/local/bin/cfssljson
+
+mkdir keys
+
+echo '{
+  "signing": {
+    "default": {
+      "expiry": "8760h"
+    },
+    "profiles": {
+      "kubernetes": {
+        "usages": ["signing", "key encipherment", "server auth", "client auth"],
+        "expiry": "8760h"
+      }
+    }
+  }
+}' > ca-config.json
+
+echo '{
+  "CN": "Gagent",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "US",
+      "L": "Austin",
+      "O": "Gagent",
+      "OU": "CA",
+      "ST": "Texas"
+    }
+  ]
+}' > ca-csr.json
+
+cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+
+```
