@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/jjurach/gagent/gagent/cmd"
+import "github.com/jjurach/gagent/cmd"
 
 func main() {
 	cmd.Execute()

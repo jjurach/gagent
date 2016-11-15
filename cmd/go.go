@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/chzyer/readline"
+	"github.com/jjurach/gagent/daemon"
 	"github.com/spf13/cobra"
 )
 
@@ -116,6 +117,10 @@ func handleInteraction() {
 	}
 	defer l.Close()
 
+	fmt.Println("here")
+	daemon := daemon.NewDaemonLocal()
+	daemon.SomeFuncOnDaemon()
+
 	setPasswordCfg := l.GenPasswordConfig()
 	setPasswordCfg.SetListener(func(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
 		l.SetPrompt(fmt.Sprintf("Enter password(%v): ", len(line)))
@@ -184,7 +189,7 @@ func handleInteraction() {
 					log.Println(line)
 				}
 			}()
-		case line == "bye":
+		case line == "bye" || line == "exit":
 			goto exit
 		case line == "sleep":
 			log.Println("sleep 4 second")

@@ -1,4 +1,4 @@
-package gagent
+package daemon
 
 import (
 	"fmt"

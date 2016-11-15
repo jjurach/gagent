@@ -17,6 +17,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/jjurach/gagent/agent"
 	"github.com/spf13/cobra"
 )
 
@@ -26,8 +27,16 @@ var agentCmd = &cobra.Command{
 	Short: "Accept command requests, respond with command execution output",
 	Long:  `Speak simplistic message passing with STDIN/STDOUT. Listen for incoming requests. Allow requests to be executed in parallel. Provide asynchronous events back to caller (started, stopped). Allow admin messages to query state, vsz, cpu load, etc. and enforce resource thresholds on processes currently managed.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		fmt.Println("agent called - agent will run commands relayed through daemon.")
+
+		fmt.Println("starting agent")
+		commands := []string{"date", "sleep 0.4", "date"}
+
+		responses := make(chan agent.CommandResponse)
+		go agent.ApplyCommands(commands, responses)
+		for i := 0; i < len(commands); i++ {
+			response := <-responses
+			fmt.Println("got response", response)
+		}
 	},
 }
 
