@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/chzyer/readline"
+	"github.com/jjurach/gagent/agent"
 	"github.com/jjurach/gagent/daemon"
 	"github.com/spf13/cobra"
 )
@@ -171,6 +172,26 @@ func handleInteraction() {
 			if err == nil {
 				println("you set:", strconv.Quote(string(pswd)))
 			}
+		case strings.HasPrefix(line, "run"):
+			cmd := strings.TrimSpace(line[3:])
+			if cmd == "" {
+				log.Println("Usage: run <command>")
+				break
+			}
+			log.Printf("TODO - need to validate/audit command")
+			command := agent.CommandRequest{time.Now(), cmd}
+			log.Printf("running %v\n", command)
+
+			//command := CommandRequest{time.Now(), "/bin/false"}
+
+			ch := make(chan agent.CommandResponse)
+			go agent.ApplyCommand(command, ch)
+			response := <-ch
+
+			fmt.Printf("%d bytes applied after %v duration with error %v\n",
+				len(response.Output), response.Elapsed, response.Error)
+			fmt.Printf("[%s]\n", strings.TrimSpace(string(response.Output)))
+
 		case strings.HasPrefix(line, "setprompt"):
 			prompt := line[10:]
 			if prompt == "" {
@@ -189,7 +210,7 @@ func handleInteraction() {
 					log.Println(line)
 				}
 			}()
-		case line == "bye" || line == "exit":
+		case line == "bye" || line == "exit" || line == "quit" || line == "q":
 			goto exit
 		case line == "sleep":
 			log.Println("sleep 4 second")

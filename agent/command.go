@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -29,15 +30,16 @@ func (r CommandResponse) String() string {
 		r.Output, r.StartTime, r.Error, r.Elapsed)
 }
 
-func ApplyCommands(commands []string, ch chan<- CommandResponse) {
-	for _, cmd := range commands {
-		command := CommandRequest{
-			time.Now(),
-			cmd,
-		}
-		fmt.Println("applying", command)
-		ApplyCommand(command, ch)
+type CommandWorker struct {
+	ReqC chan CommandRequest
+	RspC chan CommandResponse
+}
+
+func (w *CommandWorker) Work(wg *sync.WaitGroup) {
+	for command := range w.ReqC {
+		ApplyCommand(command, w.RspC)
 	}
+	wg.Done()
 }
 
 func ApplyCommand(command CommandRequest, ch chan<- CommandResponse) {

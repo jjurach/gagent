@@ -2,6 +2,7 @@ package agent
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 )
@@ -37,21 +38,44 @@ func TestApplyCommand(t *testing.T) {
 		len(response.Output), response.Elapsed, response.Error)
 }
 
+var wg sync.WaitGroup
+
 func TestApplyCommands(t *testing.T) {
-	cmds := []string{"sleep 0.2", "sleep 0.1", "sleep 0.3"}
 
-	creq := make(chan CommandRequest)
-	crsp := make(chan CommandResponse)
-
-	go CommandWorkQueue(creq, crsp)
-
-	// send commands into the request channel
-	for _, cmd := range cmds {
-		creq <- CommandRequest{time.Now(), cmd}
+	worker := CommandWorker{
+		make(chan CommandRequest, 10),
+		make(chan CommandResponse),
 	}
-	for i := 1; i <= len(cmds); i++ {
-		response := <-crsp
-		fmt.Printf("just received %d bytes after %v duration with %v\n",
-			len(response.Output), response.Elapsed, response.Error)
+
+	// the commands to execute.
+	cmds := []string{"sleep 0.1", "sleep 0.05", "sleep 0.2", "sleep 0.05", "sleep 0.15", "sleep 0.05"}
+
+	// apply bounding around number of allowed, concurrent UNIX commands.
+	numWorkers := 3
+	wg.Add(numWorkers + 2)
+	for n := 0; n < numWorkers; n++ {
+		go worker.Work(&wg)
 	}
+
+	// send commands into the request channel.
+	go func() {
+		for _, cmd := range cmds {
+			fmt.Println("sending command", cmd)
+			worker.ReqC <- CommandRequest{time.Now(), cmd}
+		}
+		close(worker.ReqC)
+		wg.Done()
+	}()
+
+	// receive responses from response channel.
+	go func() {
+		for i := 1; i <= len(cmds); i++ {
+			response := <-worker.RspC
+			fmt.Printf("received response: %d bytes after %v duration with %v\n",
+				len(response.Output), response.Elapsed, response.Error)
+		}
+		wg.Done()
+	}()
+
+	wg.Wait()
 }
